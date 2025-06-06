@@ -119,3 +119,53 @@ class BlogPost(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Blog Post'
         verbose_name_plural = 'Blog Posts'
+
+
+
+
+class TourPackage(models.Model):
+    title = models.CharField(max_length=100)
+    duration = models.CharField(max_length=100)
+
+    image = models.ImageField(upload_to='tour_images/')
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
+    
+
+
+class HotelDetails(models.Model):
+    tour_package = models.ForeignKey(TourPackage, on_delete=models.CASCADE)
+    location = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    room_type = models.CharField(max_length=100)
+    meal_plan = models.CharField(max_length=100)
+    nights = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class ItineraryDetails(models.Model):
+    tour_package = models.ForeignKey(TourPackage, on_delete=models.CASCADE)
+    day_number = models.PositiveIntegerField()
+    title = models.CharField(max_length=100)
+    description = models.TextField(help_text="Use the bullet point symbol (●) at the beginning of each new point for proper formatting in the frontend.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Day {self.day_number}: {self.title}"
+    
+    class Meta:
+        ordering = ['tour_package', 'day_number']
+        verbose_name = 'Itinerary Day'
+        verbose_name_plural = 'Itinerary Days'
+
+    
+
+
+
+

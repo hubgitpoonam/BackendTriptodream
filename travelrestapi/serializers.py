@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Contact, Itinerary, BlogPost
+from .models import Contact, Itinerary, BlogPost, TourPackage, HotelDetails, ItineraryDetails
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,3 +28,36 @@ class BlogPostSerializer(serializers.ModelSerializer):
             if request:
                 return request.build_absolute_uri(obj.image.url)
         return None 
+    
+
+class HotelDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HotelDetails
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+class ItineraryDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItineraryDetails
+        fields = ['id', 'tour_package', 'day_number', 'title', 'description', 'created_at', 'updated_at']
+
+class ItineraryDaySerializers(serializers.ModelSerializer):
+    class Meta:
+        model = ItineraryDetails
+        fields = ['id', 'day_number', 'title', 'description']
+
+class TourPackageSerializer(serializers.ModelSerializer):
+    hotels = serializers.SerializerMethodField()
+    itinerary = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TourPackage
+        fields = ['id', 'title', 'duration', 'image', 'description', 'hotels', 'itinerary']
+
+    def get_hotels(self, obj):
+        hotels = HotelDetails.objects.filter(tour_package=obj)
+        return HotelDetailsSerializer(hotels, many=True).data
+
+    def get_itinerary(self, obj):
+        itinerary = ItineraryDetails.objects.filter(tour_package=obj).order_by('day_number')
+        return ItineraryDetailsSerializer(itinerary, many=True).data

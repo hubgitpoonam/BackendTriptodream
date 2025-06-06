@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .models import Contact, Itinerary, BlogPost
-from .serializers import ContactSerializer, ItinerarySerializer, BlogPostSerializer
+from .models import Contact, Itinerary, BlogPost, TourPackage, HotelDetails,ItineraryDetails
+from .serializers import ContactSerializer, ItinerarySerializer, BlogPostSerializer, TourPackageSerializer, HotelDetailsSerializer, ItineraryDetailsSerializer
 from django.core.mail import send_mail
 from django.conf import settings
 import os
@@ -120,3 +120,21 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         return context
+
+
+class TourPackageViewSet(viewsets.ModelViewSet):
+    queryset = TourPackage.objects.all()
+    serializer_class = TourPackageSerializer
+
+class HotelDetailViewSet(viewsets.ModelViewSet):
+    queryset = HotelDetails.objects.all()
+    serializer_class = HotelDetailsSerializer
+
+class ItineraryDayViewSet(viewsets.ModelViewSet):
+    queryset = ItineraryDetails.objects.all()
+    serializer_class = ItineraryDetailsSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
